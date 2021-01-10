@@ -1,5 +1,4 @@
-This is the python wrapper for [Artistic style transfer for videos](https://github.com/manuelruder/artistic-videos). It lets process a video or a part of it through a batch of styles in series.
-I use it for choosing a style which fits the most to the video..
+This is the python wrapper for [Artistic style transfer for videos](https://github.com/manuelruder/artistic-videos). It lets process a video or a part of it through a batch of styles in series. I use it for choosing a style which fits the most to the video..
 
 My environment is Ubuntu 18.04, CUDA 10.0 and Cudnn 7.6.5 drivers and GPU Nvidia RTX 2070 Super MAX-Q with 8 GB RAM.
 
@@ -56,5 +55,12 @@ There is an example of stylize.config file in the repo:
 * Make final video:
 
   make_video: true
+
+
+After stylize.config is defined run 
+```
+python stylize.py
+```
+
 
 You can find my stylized videos [here](https://www.instagram.com/anre_rule/)
