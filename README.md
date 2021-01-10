@@ -3,7 +3,7 @@ I use it for choosing a style which fits the most to the video..
 
 My environment is Ubuntu 18.04, CUDA 10.0 and Cudnn 7.6.5 drivers and GPU Nvidia RTX 2070 Super MAX-Q with 8 GB RAM.
 
-For computing optical flow I use [NVidia Flownet 2 Pytorch](https://github.com/NVIDIA/flownet2-pytorch) set up in a separate Conda environment. Unlike DeepFlow, suggested in the original repository, FlowNet2 is much faster and doesn't require any RAM, because it utilizes Cudnn for the computation. It is nice for those who want to keep using the PC in parallel while the video is being stylized. I've slightly modified main.py to add backward processing which is enabled if --backward flag is presented, this means that the frames are interated in an opposite order.
+For computing optical flow I use [NVidia Flownet 2 Pytorch](https://github.com/ryletko/flownet2-pytorch) set up in a separate Conda environment. Unlike DeepFlow, suggested in the original repository, FlowNet2 is much faster and doesn't require any RAM, because it utilizes Cudnn for the computation. It is nice for those who want to keep using the PC in parallel while the video is being stylized. I've slightly modified main.py to add backward processing which is enabled if --backward flag is presented, this means that the frames are interated in an opposite order.
 
 There is an example of stylize.config file in the repo:
 
