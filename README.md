@@ -38,6 +38,7 @@ There is an example of stylize.config file in the repo:
 * Parameters described in the original repo [Artistic style transfer for videos](https://github.com/manuelruder/artistic-videos):
 
   style_weight: 1e3
+  
   temporal_weight: 1e3
 
 * Delete all previous outputs prior start:
