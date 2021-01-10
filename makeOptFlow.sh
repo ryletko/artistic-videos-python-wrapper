@@ -1,11 +1,4 @@
-# Specify the path to the optical flow utility here.
-# Also check line 44 and 47 whether the arguments are in the correct order.
-flowCommandLine="bash run-deepflow.sh"
-
-if [ -z "$flowCommandLine" ]; then
-  echo "Please open makeOptFlow.sh and specify the command line for computing the optical flow."
-  exit 1
-fi
+#!/bin/bash
 
 if [ ! -f ./consistencyChecker/consistencyChecker ]; then
   if [ ! -f ./consistencyChecker/Makefile ]; then
@@ -17,35 +10,46 @@ if [ ! -f ./consistencyChecker/consistencyChecker ]; then
   cd ..
 fi
 
-filePattern=$1
-folderName=$2
-startFrame=${3:-1}
-stepSize=${4:-1}
+workdir=$1
+framesdir=$2
+filePattern=$3
+folderName=$4
+startFrame=${45:-1}
+stepSize=${6:-1}
 
-if [ "$#" -le 1 ]; then
-   echo "Usage: ./makeOptFlow <filePattern> <outputFolder> [<startNumber> [<stepSize>]]"
-   echo -e "\tfilePattern:\tFilename pattern of the frames of the videos."
-   echo -e "\toutputFolder:\tOutput folder."
-   echo -e "\tstartNumber:\tThe index of the first frame. Default: 1"
-   echo -e "\tstepSize:\tThe step size to create long-term flow. Default: 1"
-   exit 1
-fi
+source ~/anaconda3/etc/profile.d/conda.sh
+conda activate flownet-env
+
+mkdir -p "${folderName}"
+
+python ~/flownet2-nvidia/main.py --inference --model FlowNet2 --save_flow \
+--inference_dataset ImagesFromFolder \
+--inference_dataset_root ${framesdir} \
+--resume ~/flownet2-nvidia/checkpoints/FlowNet2_checkpoint.pth.tar \
+--save ${folderName}/forward \
+--inference_visualize
+
+python ~/flownet2-nvidia/main.py --inference --model FlowNet2 --save_flow \
+--inference_dataset ImagesFromFolder \
+--inference_dataset_root ${framesdir} \
+--resume ~/flownet2-nvidia/checkpoints/FlowNet2_checkpoint.pth.tar \
+--save ${folderName}/backward \
+--inference_visualize --backward
+
+python ${workdir}/prepare_flownames.py --path ${folderName}/forward
+mv -t ${folderName} ${folderName}/forward/*.flo 
+rm -r ${folderName}/forward/
+python ${workdir}/prepare_flownames.py --path ${folderName}/backward --backward
+mv -t ${folderName} ${folderName}/backward/*.flo
+rm -r ${folderName}/backward/
 
 i=$[$startFrame]
 j=$[$startFrame + $stepSize]
-
-mkdir -p "${folderName}"
 
 while true; do
   file1=$(printf "$filePattern" "$i")
   file2=$(printf "$filePattern" "$j")
   if [ -a $file2 ]; then
-    if [ ! -f ${folderName}/forward_${i}_${j}.flo ]; then
-      eval $flowCommandLine "$file1" "$file2" "${folderName}/forward_${i}_${j}.flo"
-    fi
-    if [ ! -f ${folderName}/backward_${j}_${i}.flo ]; then
-      eval $flowCommandLine "$file2" "$file1" "${folderName}/backward_${j}_${i}.flo"
-    fi
     ./consistencyChecker/consistencyChecker "${folderName}/backward_${j}_${i}.flo" "${folderName}/forward_${i}_${j}.flo" "${folderName}/reliable_${j}_${i}.pgm"
     ./consistencyChecker/consistencyChecker "${folderName}/forward_${i}_${j}.flo" "${folderName}/backward_${j}_${i}.flo" "${folderName}/reliable_${i}_${j}.pgm"
   else
