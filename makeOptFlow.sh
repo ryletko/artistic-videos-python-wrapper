@@ -14,25 +14,27 @@ workdir=$1
 framesdir=$2
 filePattern=$3
 folderName=$4
-startFrame=${45:-1}
-stepSize=${6:-1}
+flownet2Nvidia=$5
+condaEnv=$6
+startFrame=${7:-1}
+stepSize=${8:-1}
 
 source ~/anaconda3/etc/profile.d/conda.sh
-conda activate flownet-env
+conda activate ${condaEnv}
 
 mkdir -p "${folderName}"
 
-python ~/flownet2-nvidia/main.py --inference --model FlowNet2 --save_flow \
+python ${flownet2Nvidia}/main.py --inference --model FlowNet2 --save_flow \
 --inference_dataset ImagesFromFolder \
 --inference_dataset_root ${framesdir} \
---resume ~/flownet2-nvidia/checkpoints/FlowNet2_checkpoint.pth.tar \
+--resume ${flownet2Nvidia}/checkpoints/FlowNet2_checkpoint.pth.tar \
 --save ${folderName}/forward \
 --inference_visualize
 
-python ~/flownet2-nvidia/main.py --inference --model FlowNet2 --save_flow \
+python ${flownet2Nvidia}/main.py --inference --model FlowNet2 --save_flow \
 --inference_dataset ImagesFromFolder \
 --inference_dataset_root ${framesdir} \
---resume ~/flownet2-nvidia/checkpoints/FlowNet2_checkpoint.pth.tar \
+--resume ${flownet2Nvidia}/checkpoints/FlowNet2_checkpoint.pth.tar \
 --save ${folderName}/backward \
 --inference_visualize --backward
 

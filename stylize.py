@@ -31,6 +31,8 @@ def dowork():
     style_weight = config_obj["style_weight"]
     temporal_weight = config_obj["temporal_weight"]
     out_dir = os.path.join(work_path, "out")
+    flownet2_nvidia = config_obj["flownet2_nvidia_path"]
+    conda_env = config_obj["conda_env"]
 
     if (config_obj["clean"] == True and os.path.exists(work_path)):
         shutil.rmtree(work_path)
@@ -59,8 +61,7 @@ def dowork():
 
     if (config_obj["optflow"] == True):
         makeOptFlowScript = os.path.join(dir_path, "makeOptFlow.sh")
-        prepareflownames_py = os.path.join(dir_path, "prepare_flownames.py")
-        process = subprocess.check_call([ makeOptFlowScript, dir_path, frames_path, extract_frames_mask, f"{work_path}/flow_{resolution}/", prepareflownames_py ])
+        process = subprocess.check_call([ makeOptFlowScript, dir_path, frames_path, extract_frames_mask, f"{work_path}/flow_{resolution}/", flownet2_nvidia, conda_env  ])
 
     if (not os.path.exists(out_dir)):
         os.mkdir(out_dir)
