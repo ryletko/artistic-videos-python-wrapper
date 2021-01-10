@@ -56,4 +56,4 @@ There is an example of stylize.config file in the repo:
 
   make_video: true
 
-My stylized videos you can find [here](https://www.instagram.com/anre_rule/)
+You can find my stylized videos [here](https://www.instagram.com/anre_rule/)
