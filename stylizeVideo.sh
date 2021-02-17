@@ -1,3 +1,4 @@
+#!/bin/bash
 set -e
 # Get a carriage return into `cr`
 cr=`echo $'\n.'`
@@ -24,44 +25,41 @@ extension="${filename##*.}"
 filename="${filename%.*}"
 filename=${filename//[%]/x}
 style_image=$2
+resolution="1280x720"
 
 # Create output folder
 mkdir -p $filename
 
 
-echo ""
-read -p "Which backend do you want to use? \
-For Nvidia GPU, use cudnn if available, otherwise nn. \
-For non-Nvidia GPU, use clnn. Note: You have to have the given backend installed in order to use it. [nn] $cr > " backend
-backend=${backend:-nn}
+backend="cudnn"
 
-if [ "$backend" == "cudnn" ]; then
-  echo ""
-  read -p "This algorithm needs a lot of memory. \
-  For a resolution of 450x350 you'll need roughly 2GB VRAM. \
-  VRAM usage increases linear with resolution. \
-  Please enter a resolution at which the video should be processed, \
-  in the format w:h, or leave blank to use the original resolution $cr > " resolution
-elif [ "$backend" = "nn" ] || [ "$backend" = "clnn" ]; then
-  echo ""
-  read -p "This algorithm needs a lot of memory. \
-  For a resolution of 450x350 you'll need roughly 4GB VRAM. \
-  VRAM usage increases linear with resolution. \
-  Maximum recommended resolution with a Titan X 12GB: 960:540. \
-  Please enter a resolution at which the video should be processed, \
-  in the format w:h, or leave blank to use the original resolution $cr > " resolution
-else
-  echo "Unknown backend."
-  exit 1
-fi
+# if [ "$backend" == "cudnn" ]; then
+#   echo ""
+#   read -p "This algorithm needs a lot of memory. \
+#   For a resolution of 450x350 you'll need roughly 2GB VRAM. \
+#   VRAM usage increases linear with resolution. \
+#   Please enter a resolution at which the video should be processed, \
+#   in the format w:h, or leave blank to use the original resolution $cr > " resolution
+# elif [ "$backend" = "nn" ] || [ "$backend" = "clnn" ]; then
+#   echo ""
+#   read -p "This algorithm needs a lot of memory. \
+#   For a resolution of 450x350 you'll need roughly 4GB VRAM. \
+#   VRAM usage increases linear with resolution. \
+#   Maximum recommended resolution with a Titan X 12GB: 960:540. \
+#   Please enter a resolution at which the video should be processed, \
+#   in the format w:h, or leave blank to use the original resolution $cr > " resolution
+# else
+#   echo "Unknown backend."
+#   exit 1
+# fi
 
-# Save frames of the video as individual image files
-if [ -z $resolution ]; then
-  $FFMPEG -i $1 ${filename}/frame_%04d.ppm
-  resolution=default
-else
-  $FFMPEG -i $1 -vf scale=$resolution ${filename}/frame_%04d.ppm
-fi
+# # Save frames of the video as individual image files
+# if [ -z $resolution ]; then
+#   $FFMPEG -i $1 ${filename}/frame_%04d.ppm
+#   resolution=default
+# else
+$FFMPEG -i $1 -vf scale=$resolution ${filename}/frame_%04d.png
+# fi
 
 echo ""
 read -p "How much do you want to weight the style reconstruction term? \
@@ -71,18 +69,18 @@ style_weight=${style_weight:-1e2}
 
 temporal_weight=1e3
 
-echo ""
-read -p "Enter the zero-indexed ID of the GPU to use, or -1 for CPU mode (very slow!).\
- [0] $cr > " gpu
-gpu=${gpu:-0}
+gpu="0"
 
 echo ""
 echo "Computing optical flow. This may take a while..."
-bash makeOptFlow.sh ./${filename}/frame_%04d.ppm ./${filename}/flow_$resolution
+
+BASEDIR=$(dirname $0)
+echo ${BASEDIR}
+bash makeOptFlow.sh ${BASEDIR}/${filename}/ ${BASEDIR}/${filename}/frame_%04d.png ${BASEDIR}/${filename}/flow_$resolution 
 
 # Perform style transfer
-th artistic_video.lua \
--content_pattern ${filename}/frame_%04d.ppm \
+~/torch/install/bin/th ${BASEDIR}/artistic_video.lua \
+-content_pattern ${filename}/frame_%04d.png \
 -flow_pattern ${filename}/flow_${resolution}/backward_[%d]_{%d}.flo \
 -flowWeight_pattern ${filename}/flow_${resolution}/reliable_[%d]_{%d}.pgm \
 -style_weight $style_weight \
@@ -95,4 +93,4 @@ th artistic_video.lua \
 -number_format %04d
 
 # Create video from output images.
-$FFMPEG -i ${filename}/out-%04d.png ${filename}-stylized.$extension
+# $FFMPEG -i ${filename}/out-%04d.png ${filename}-stylized.$extension
