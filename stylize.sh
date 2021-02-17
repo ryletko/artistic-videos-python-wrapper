@@ -1,0 +1,1 @@
+sudo bash ~/artistic-videos-classic/stylizeVideo.sh "/home/anre/Documents/footages/cut_punch.mkv" "/home/anre/Documents/images/purple_pixels.jpg"
