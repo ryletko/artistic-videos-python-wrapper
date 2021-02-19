@@ -41,7 +41,7 @@ def dowork():
     continue_with_pass = config_obj["continue_with_pass"]
     num_passes = config_obj["num_passes"]
     out = config_obj["out"]
-    out_dir = out if out is not None else os.path.join(work_path, "out")
+    out_dir = os.path.join(out, work_name) if out is not None else os.path.join(work_path, "out")
 
 
     flow_path = f"{work_path}/flow_{resolution}/"
