@@ -19,8 +19,8 @@ condaEnv=$6
 startFrame=${7:-1}
 stepSize=${8:-1}
 
-source ~/anaconda3/etc/profile.d/conda.sh
-conda activate ${condaEnv}
+# source ~/anaconda3/etc/profile.d/conda.sh
+source activate ${condaEnv}
 
 mkdir -p "${folderName}"
 
