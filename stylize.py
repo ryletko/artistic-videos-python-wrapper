@@ -34,13 +34,15 @@ def dowork():
     temporal_weight = config_obj["temporal_weight"]
     style_scales = config_obj["style_scale"].split(",")
     tv_weights = config_obj["tv_weight"].split(",")
-    out_dir = os.path.join(work_path, "out")
     flownet2_nvidia = config_obj["flownet2_nvidia_path"]
     conda_env = config_obj["conda_env"]
     multipass = config_obj["multipass"]
     continue_with = config_obj["continue_with"]
     continue_with_pass = config_obj["continue_with_pass"]
     num_passes = config_obj["num_passes"]
+    out = config_obj["out"]
+    out_dir = out if out is not None else os.path.join(work_path, "out")
+
 
     flow_path = f"{work_path}/flow_{resolution}/"
 
